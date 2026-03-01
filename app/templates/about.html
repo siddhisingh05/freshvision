@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}About — FreshnessAI{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <h2 class="fw-bold mb-4">About This Project</h2>
+
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-body p-4">
+        <h5 class="fw-semibold text-success">Project Summary</h5>
+        <p>
+          FreshnessAI is a unified, AI-based food freshness classification system capable of
+          assessing freshness across multiple food categories — fruits, vegetables, meat, and dairy —
+          using computer vision and deep learning.
+        </p>
+        <p class="mb-0">
+          Built as a Machine Learning Mini Project (3 Academic Credits) using
+          <strong>Flask</strong>, <strong>TensorFlow / MobileNetV2</strong>,
+          <strong>SQLite</strong>, and deployed on <strong>AWS EC2</strong>.
+        </p>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-body p-4">
+        <h5 class="fw-semibold text-success">Tech Stack</h5>
+        <table class="table table-borderless mb-0">
+          <tr><td><strong>Backend</strong></td><td>Python 3.10, Flask 3.0</td></tr>
+          <tr><td><strong>Frontend</strong></td><td>Jinja2 Templates, Bootstrap 5</td></tr>
+          <tr><td><strong>AI / ML</strong></td><td>TensorFlow 2.13, MobileNetV2</td></tr>
+          <tr><td><strong>Database</strong></td><td>SQLite (via Flask built-in)</td></tr>
+          <tr><td><strong>Cloud</strong></td><td>AWS EC2, S3 (model storage)</td></tr>
+          <tr><td><strong>CI/CD</strong></td><td>GitHub Actions + Docker</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-4">
+        <h5 class="fw-semibold text-success">Team</h5>
+        <ul class="list-unstyled mb-0">
+          <li><i class="bi bi-person-fill me-2 text-success"></i><strong>[Your Name]</strong> — ML Engineer / Full-Stack</li>
+          <!-- TODO: add team members -->
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

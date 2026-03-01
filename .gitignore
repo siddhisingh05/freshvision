@@ -5,19 +5,21 @@ __pycache__/
 .env
 venv/
 .venv/
-*.egg-info/
 
-# ML models (large files — store in S3 instead)
+# Flask
+instance/
+freshness.db
+
+# ML models (store in S3 — too large for Git)
 *.h5
 *.pt
 *.pkl
 ml/data/raw/
 ml/data/processed/
 
-# Node
-node_modules/
-frontend/build/
-frontend/.env.local
+# Uploads (user data — don't commit)
+app/static/uploads/*
+!app/static/uploads/.gitkeep
 
 # Docker
 .dockerenv
@@ -29,4 +31,3 @@ frontend/.env.local
 
 # Logs
 *.log
-logs/

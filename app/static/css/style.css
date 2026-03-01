@@ -1,0 +1,35 @@
+/* app/static/css/style.css */
+
+body {
+  background-color: #f9fafb;
+  font-family: "Segoe UI", Roboto, sans-serif;
+}
+
+/* Dashed drop zone */
+#drop-zone {
+  transition: background 0.2s, border-color 0.2s;
+}
+#drop-zone:hover {
+  background: #f0fff0 !important;
+  border-color: #198754 !important;
+}
+
+/* Progress bars — no animation flash on load */
+.progress-bar {
+  transition: width 0.6s ease;
+}
+
+/* Navbar brand */
+.navbar-brand {
+  font-size: 1.3rem;
+  letter-spacing: 0.5px;
+}
+
+/* Card hover lift */
+.card {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08) !important;
+}

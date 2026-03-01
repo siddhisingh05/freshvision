@@ -1,19 +1,15 @@
 """
-preprocess.py — Download, clean, augment, and split dataset.
+ml/scripts/preprocess.py — Dataset download, clean, augment, split
 Run: python preprocess.py
 """
-# import os, shutil
-# from sklearn.model_selection import train_test_split
-# from tensorflow.keras.preprocessing.image import ImageDataGenerator
-
-RAW_DIR = "../data/raw"
+RAW_DIR       = "../data/raw"
 PROCESSED_DIR = "../data/processed"
-SPLIT = (0.70, 0.15, 0.15)  # train / val / test
+SPLIT         = (0.70, 0.15, 0.15)   # train / val / test
 
 def run():
-    """Resize images, apply augmentation config, save splits."""
-    # TODO: implement
-    print("TODO: implement preprocessing pipeline")
+    """Resize images, apply augmentation config, save train/val/test splits."""
+    # TODO: implement using tf.keras.preprocessing or torchvision
+    print("[preprocess] TODO: implement dataset pipeline")
 
 if __name__ == "__main__":
     run()

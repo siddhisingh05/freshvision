@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Result — FreshnessAI{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <h2 class="fw-bold mb-4"><i class="bi bi-clipboard-data me-2 text-success"></i>Classification Result</h2>
+
+    <div class="row g-4">
+      <!-- Uploaded Image -->
+      <div class="col-md-5 text-center">
+        <img src="{{ url_for('static', filename='uploads/' + filename) }}"
+             alt="Uploaded food" class="img-fluid rounded shadow" style="max-height:280px;" />
+      </div>
+
+      <!-- Result Card -->
+      <div class="col-md-7">
+        {% set badge_color = "success" if result.label == "Fresh" else ("warning" if result.label == "Moderately Fresh" else "danger") %}
+        <div class="card border-{{ badge_color }} shadow-sm h-100">
+          <div class="card-header bg-{{ badge_color }} text-white fw-semibold fs-5">
+            <i class="bi bi-patch-check me-2"></i>{{ result.label }}
+          </div>
+          <div class="card-body">
+            <p class="mb-3">
+              <strong>Confidence:</strong>
+              <span class="badge bg-{{ badge_color }} ms-1">{{ (result.confidence * 100) | round(1) }}%</span>
+            </p>
+
+            <p class="fw-semibold mb-2">Score Breakdown:</p>
+            {% for label, score in result.scores.items() %}
+              {% set bar_color = "success" if label == "Fresh" else ("warning" if label == "Moderately Fresh" else "danger") %}
+              <div class="mb-2">
+                <div class="d-flex justify-content-between small mb-1">
+                  <span>{{ label }}</span>
+                  <span>{{ (score * 100) | round(1) }}%</span>
+                </div>
+                <div class="progress" style="height:10px;">
+                  <div class="progress-bar bg-{{ bar_color }}"
+                       role="progressbar"
+                       style="width: {{ (score * 100) | round(1) }}%">
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="d-flex gap-3 mt-4">
+      <a href="{{ url_for('predict.predict') }}" class="btn btn-success">
+        <i class="bi bi-arrow-repeat me-1"></i>Classify Another
+      </a>
+      <a href="{{ url_for('history.history') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-clock-history me-1"></i>View History
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

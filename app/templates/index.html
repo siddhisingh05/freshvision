@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Home — FreshnessAI{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="p-5 mb-4 bg-success bg-opacity-10 rounded-3 text-center">
+  <h1 class="display-5 fw-bold text-success">
+    <i class="bi bi-leaf-fill me-2"></i>Food Freshness Classifier
+  </h1>
+  <p class="col-md-8 mx-auto fs-5 text-muted">
+    Upload a photo of any fruit, vegetable, meat, or dairy product and our AI
+    will instantly classify its freshness level.
+  </p>
+  <a href="{{ url_for('predict.predict') }}" class="btn btn-success btn-lg mt-2">
+    <i class="bi bi-camera me-2"></i>Classify Food Now
+  </a>
+</div>
+
+<!-- Feature Cards -->
+<div class="row g-4 mt-2">
+  <div class="col-md-4">
+    <div class="card h-100 border-0 shadow-sm">
+      <div class="card-body text-center p-4">
+        <i class="bi bi-cpu fs-1 text-success mb-3"></i>
+        <h5 class="card-title">AI-Powered</h5>
+        <p class="card-text text-muted">MobileNetV2 deep learning model trained on thousands of freshness images.</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card h-100 border-0 shadow-sm">
+      <div class="card-body text-center p-4">
+        <i class="bi bi-lightning-charge fs-1 text-warning mb-3"></i>
+        <h5 class="card-title">Real-Time</h5>
+        <p class="card-text text-muted">Get freshness results in under a second — no waiting, no manual inspection.</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card h-100 border-0 shadow-sm">
+      <div class="card-body text-center p-4">
+        <i class="bi bi-grid-3x3-gap fs-1 text-primary mb-3"></i>
+        <h5 class="card-title">Multi-Category</h5>
+        <p class="card-text text-muted">Supports fruits, vegetables, meat, and dairy with a single unified model.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Freshness Classes Explainer -->
+<div class="row g-3 mt-4">
+  <div class="col-12"><h4 class="fw-semibold">Freshness Classes</h4></div>
+  <div class="col-md-4">
+    <div class="card border-success">
+      <div class="card-body">
+        <span class="badge bg-success fs-6 mb-2">Fresh</span>
+        <p class="text-muted mb-0">Safe to eat. Optimal quality, colour, and texture.</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card border-warning">
+      <div class="card-body">
+        <span class="badge bg-warning text-dark fs-6 mb-2">Moderately Fresh</span>
+        <p class="text-muted mb-0">Consume soon. Early signs of deterioration present.</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card border-danger">
+      <div class="card-body">
+        <span class="badge bg-danger fs-6 mb-2">Spoiled</span>
+        <p class="text-muted mb-0">Do not consume. Significant decay detected.</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

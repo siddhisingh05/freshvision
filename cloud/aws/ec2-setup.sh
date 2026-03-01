@@ -1,13 +1,18 @@
 #!/bin/bash
-# EC2 instance bootstrap script (Ubuntu 22.04)
-# Run once after launching your EC2 instance
+# cloud/aws/ec2-setup.sh
+# Run once after launching your AWS EC2 Ubuntu 22.04 instance
 
 sudo apt-get update -y
-sudo apt-get install -y docker.io docker-compose git
+sudo apt-get install -y docker.io docker-compose git python3-pip
 
-# Pull and run the app
+sudo systemctl start docker
+sudo usermod -aG docker ubuntu
+
+# Clone project
 git clone https://github.com/YOUR_USERNAME/freshness-classifier.git
 cd freshness-classifier
+
+# Start app
 docker-compose up -d
 
-echo "Setup complete. API running at port 8000."
+echo "✅ App is running at http://$(curl -s ifconfig.me):5000"
