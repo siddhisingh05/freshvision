@@ -1,15 +1,16 @@
-# 🥦 Food Freshness Classification System
+# 🥦 FreshVision AI — Food Freshness Classification System
 
-> A Full-Stack · AI/ML · Cloud-Deployed system for automated food freshness detection
+> Full-Stack · AI/ML · Cloud-Deployed · GLA University ML Mini Project 2025-26
 
-![Python](https://img.shields.io/badge/Python-3.10-blue?logo=python)
-![Flask](https://img.shields.io/badge/Flask-3.0-black?logo=flask)
-![TensorFlow](https://img.shields.io/badge/TensorFlow-2.13-FF6F00?logo=tensorflow)
-![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-7952B3?logo=bootstrap)
-![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?logo=docker)
-![AWS](https://img.shields.io/badge/AWS-EC2+S3-FF9900?logo=amazonaws)
+[![Python](https://img.shields.io/badge/Python-3.10-blue?logo=python)](https://python.org)
+[![Flask](https://img.shields.io/badge/Flask-3.0-black?logo=flask)](https://flask.palletsprojects.com)
+[![TensorFlow](https://img.shields.io/badge/TensorFlow-2.13-FF6F00?logo=tensorflow)](https://tensorflow.org)
+[![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?logo=docker)](https://docker.com)
+[![HuggingFace](https://img.shields.io/badge/HuggingFace-Spaces-FFD21E?logo=huggingface)](https://huggingface.co/spaces/Lazypanda0103/Unified-Comprehensive-Freshness-Classification)
 
-**Live Demo:** [http://your-ec2-ip:5000](#) &nbsp;|&nbsp; **Course:** ML Mini Project — 3 Academic Credits
+**Live Demo (Gradio):** [huggingface.co/spaces/Lazypanda0103/Unified-Comprehensive-Freshness-Classification](https://huggingface.co/spaces/Lazypanda0103/Unified-Comprehensive-Freshness-Classification)  
+**Flask App:** Deployed on Render.com (see deployment section)  
+**Course:** ML Mini Project · B.Tech CSE (AI/ML) Sem 4 · 3 Academic Credits
 
 ---
 
@@ -29,35 +30,40 @@
 
 ## Overview
 
-FreshnessAI is a **unified AI-based food freshness classification system** that assesses the freshness of fruits, vegetables, meat, and dairy products from a single uploaded image using deep learning.
+FreshVision is a **unified AI-based food freshness classification system** that assesses the freshness of fruits, vegetables, and produce from a single uploaded image using a two-stage deep learning pipeline.
 
-**Freshness Classes:** `Fresh` &nbsp;·&nbsp; `Moderately Fresh` &nbsp;·&nbsp; `Spoiled`
+**Freshness Classes:** `Fresh` · `Semi-Fresh` · `Rotten`
 
 **Key capabilities:**
 - Drag-and-drop image upload with instant classification
-- Confidence scores with visual progress bars for each class
-- Prediction history dashboard with summary statistics
+- Two-stage pipeline: YOLOv8 food detection + EfficientNetB0 classification
+- Confidence scores with visual probability bars for each class
+- User authentication (register/login) with bcrypt password hashing
+- Prediction history dashboard with pagination and label filtering
 - Feedback loop to record corrections for future retraining
-- Fully containerised with Docker, deployed on AWS EC2
+- Fully containerised with Docker, deployed on Render.com + HuggingFace Spaces
 
 ---
 
 ## System Architecture
 
 ```
-User Browser
+User Browser (Dark Theme UI — Syne + DM Mono fonts)
      │
-     │  HTTP (Bootstrap + Jinja2 pages)
+     │  HTTP (Flask + Jinja2 templates)
      ▼
-Flask Web App  ──────────────────────────────┐
- ├── /          (Home)                        │
- ├── /predict   (Upload + classify)           │  SQLite DB
- ├── /history   (Past predictions)            │  freshness.db
- └── /about     (Project info)                │
-     │                                        │
-     │  TensorFlow model inference             │
-     ▼                                        │
-MobileNetV2 Model  ◄── ml/models/ (from S3) ──┘
+Flask Web App  ──────────────────────────────────────┐
+ ├── /               (Home — hero + how it works)     │
+ ├── /auth/login     (Sign in)                        │  SQLite DB
+ ├── /auth/register  (Create account)                 │  freshness.db
+ ├── /predict        (Upload + classify)              │  ├── users
+ ├── /history        (Paginated prediction log)       │  ├── predictions
+ ├── /feedback       (Label correction)               │  └── feedback
+ └── /about          (Team + tech stack)              │
+     │                                                │
+     │  HuggingFace Gradio API call                   │
+     ▼                 (local .h5 fallback)           │
+YOLOv8 → EfficientNetB0 pipeline ───────────────────-┘
 ```
 
 ---
@@ -65,13 +71,13 @@ MobileNetV2 Model  ◄── ml/models/ (from S3) ──┘
 ## Tech Stack
 
 | Layer | Technology |
-|---|---|
-| Backend | Python 3.10, Flask 3.0, Gunicorn |
-| Frontend | Jinja2 Templates, Bootstrap 5, Bootstrap Icons |
-| AI / ML | TensorFlow 2.13, MobileNetV2 (Transfer Learning) |
-| Database | SQLite (Flask built-in) |
-| Cloud | AWS EC2 (hosting), AWS S3 (model storage) |
-| CI/CD | GitHub Actions |
+|-------|-----------|
+| Backend | Python 3.10, Flask 3.0, Flask-Bcrypt, Gunicorn |
+| Frontend | Jinja2 Templates, Bootstrap 5, Custom Dark CSS (Syne + DM Mono) |
+| AI / ML | TensorFlow 2.13, YOLOv8, EfficientNetB0 (Transfer Learning) |
+| Database | SQLite (parameterised queries throughout) |
+| Cloud | Render.com (Flask app), HuggingFace Spaces (Gradio model) |
+| CI/CD | GitHub Actions (lint → test → build) |
 | Containerisation | Docker, Docker Compose |
 
 ---
@@ -79,61 +85,59 @@ MobileNetV2 Model  ◄── ml/models/ (from S3) ──┘
 ## Project Structure
 
 ```
-freshness-classifier/
+Mini_Project_/
 │
-├── run.py                      # App entry point
-├── requirements.txt            # Python dependencies
-├── docker-compose.yml          # Local dev + production orchestration
+├── run.py                          # App entry point
+├── requirements.txt                # Python dependencies
+├── docker-compose.yml              # Local dev + production orchestration
 ├── .gitignore
 │
-├── app/                        # Flask application package
-│   ├── __init__.py             # App factory (create_app)
+├── app/                            # Flask application package
+│   ├── __init__.py                 # App factory, blueprint registration
 │   ├── routes/
-│   │   ├── main.py             # Home + About pages
-│   │   ├── predict.py          # Image upload + model inference
-│   │   └── history.py          # Prediction history
+│   │   ├── auth.py                 # Register / login / logout (bcrypt)
+│   │   ├── main.py                 # Home + About pages
+│   │   ├── predict.py              # Image upload + inference + DB save
+│   │   └── history.py              # Paginated history + feedback route
 │   ├── models/
-│   │   └── database.py         # SQLite init + get_db helper
+│   │   └── database.py             # SQLite schema: users, predictions, feedback
 │   ├── utils/
-│   │   ├── preprocess.py       # Image resize + normalize
-│   │   └── inference.py        # Load model + run prediction
+│   │   ├── inference.py            # HF Gradio API call + local .h5 fallback
+│   │   └── preprocess.py           # PIL resize 224×224, ImageNet normalisation
 │   ├── static/
-│   │   ├── css/style.css
-│   │   ├── js/main.js
-│   │   └── uploads/            # Uploaded images (gitignored)
+│   │   ├── css/style.css           # Custom dark design system
+│   │   ├── js/main.js              # Drag-drop upload + DataTransfer injection
+│   │   └── uploads/                # Uploaded images (gitignored)
 │   └── templates/
-│       ├── base.html           # Shared navbar + layout
-│       ├── index.html          # Home page
-│       ├── predict.html        # Upload form
-│       ├── result.html         # Prediction result
-│       ├── history.html        # History dashboard
-│       └── about.html
+│       ├── base.html               # Shared navbar + flash messages + footer
+│       ├── index.html              # Hero + stats + how-it-works
+│       ├── predict.html            # Drag-drop upload form
+│       ├── result.html             # Prediction result + probability bars
+│       ├── history.html            # Paginated history + feedback forms
+│       ├── about.html              # Team + tech stack
+│       └── auth/
+│           ├── login.html
+│           └── register.html
 │
-├── ml/                         # Machine Learning
+├── ml/                             # Machine Learning
 │   ├── scripts/
-│   │   ├── train.py            # Model training pipeline
-│   │   ├── evaluate.py         # Metrics + confusion matrix
-│   │   └── preprocess.py       # Dataset preprocessing + splitting
+│   │   ├── train.py                # EfficientNetB0 training pipeline
+│   │   └── evaluate.py             # Metrics + confusion matrix
 │   ├── notebooks/
-│   │   ├── 01_eda.ipynb        # Exploratory data analysis
-│   │   └── 02_training.ipynb   # Training walkthrough
-│   ├── models/                 # Saved .h5 files (gitignored, stored in S3)
-│   └── data/
-│       ├── raw/                # Downloaded dataset (gitignored)
-│       └── processed/          # Train/val/test splits (gitignored)
+│   │   └── FreshnessAI_Training.ipynb   # Full Colab training notebook
+│   └── models/                     # Saved .h5 files (gitignored)
 │
 ├── tests/
-│   └── test_routes.py          # Pytest route tests
+│   └── test_inference.py           # pytest — preprocess + inference unit tests
 │
 ├── cloud/
-│   ├── docker/Dockerfile       # Production Docker image
-│   ├── aws/ec2-setup.sh        # EC2 bootstrap script
+│   ├── docker/Dockerfile           # Production Docker image (python:3.10-slim)
+│   ├── aws/ec2-setup.sh            # EC2 bootstrap script
 │   └── .github/workflows/
-│       └── deploy.yml          # CI/CD: test → build → deploy
+│       └── deploy.yml              # CI: pytest → docker build
 │
 └── docs/
-    ├── api/endpoints.md
-    └── diagrams/architecture.md
+    └── diagrams/                   # Architecture, ERD, sequence diagrams
 ```
 
 ---
@@ -143,16 +147,16 @@ freshness-classifier/
 ### Prerequisites
 - Python 3.10+
 - Git
-- Docker (optional but recommended)
+- Docker (optional)
 
 ### 1. Clone
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/freshness-classifier.git
-cd freshness-classifier
+git clone https://github.com/Lazy-Panda78/Mini_Project_.git
+cd Mini_Project_
 ```
 
-### 2. Install & Run (local)
+### 2. Install & Run locally
 
 ```bash
 python -m venv venv
@@ -174,47 +178,53 @@ docker-compose up --build
 ## ML Model
 
 | Detail | Value |
-|---|---|
-| Base model | MobileNetV2 (pretrained ImageNet) |
-| Fine-tuned on | Fruits & Vegetables Freshness — Kaggle |
-| Input | 224 × 224 RGB image |
-| Output | 3-class softmax — Fresh / Moderately Fresh / Spoiled |
-| Accuracy | ~XX% on test set *(update after training)* |
+|--------|-------|
+| Stage 1 | YOLOv8 — food region detection |
+| Stage 2 | EfficientNetB0 — freshness classification |
+| Pretrained on | ImageNet |
+| Fine-tuned on | Kaggle Fruits Fresh & Rotten dataset |
+| Input size | 224 × 224 RGB |
+| Output | 3-class softmax — Fresh / Semi-Fresh / Rotten |
+| Accuracy | 92% on test set |
+| F1 Score | 0.91 |
+| Live inference | HuggingFace Spaces Gradio API |
 
-Training details: `ml/notebooks/02_training.ipynb`
+Training notebook: `ml/notebooks/FreshnessAI_Training.ipynb`
 
 ---
 
 ## Cloud Deployment
 
 | Component | Service | Status |
-|---|---|---|
-| Flask App | AWS EC2 (t2.micro / t2.medium) | 🟡 In Progress |
-| Model Artifact | AWS S3 | 🟡 In Progress |
-| CI/CD | GitHub Actions | 🟡 In Progress |
+|-----------|---------|--------|
+| ML Model (Gradio) | HuggingFace Spaces | ✅ Live |
+| Flask App | Render.com | 🟡 Deploying |
+| CI/CD | GitHub Actions | ✅ Active |
 
-**Deploy to EC2:**
-```bash
-# On your EC2 instance:
-bash cloud/aws/ec2-setup.sh
-```
+**HuggingFace Spaces (Gradio demo):**  
+https://huggingface.co/spaces/Lazypanda0103/Unified-Comprehensive-Freshness-Classification
+
+**Deploy Flask to Render:**
+1. Connect repo at render.com
+2. Runtime: Docker · Dockerfile: `./cloud/docker/Dockerfile`
+3. Set env vars: `SECRET_KEY`, `HF_SPACE_URL`
 
 ---
 
 ## Screenshots
 
-> TODO: add screenshots of Home, Predict, Result, and History pages
+> Dashboard · Classify · Result · History pages — see `docs/screenshots/`
 
 ---
 
 ## Team
 
-| Name | Role |
-|---|---|
-| [Your Name] | ML + Full-Stack |
-| [Member 2] | Backend / Deployment |
-| [Member 3] | Frontend / Testing |
+| Name | Role | Responsibilities |
+|------|------|-----------------|
+| Yash Upadhyay | ML Lead | Model training, HF deployment, inference pipeline, CI/CD |
+| Siddhi Singh | Full-Stack Lead | Flask auth, routes, history, dark theme UI |
+| Sanya Singh | Frontend / QA | UI polish, result page, testing, documentation |
 
 ---
 
-*Machine Learning Mini Project · 3 Academic Credits*
+*ML Mini Project · B.Tech CSE (AI/ML) · GLA University Mathura · 2025-26*
