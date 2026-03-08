@@ -1,4 +1,4 @@
-# 🥦 FreshVision AI — Food Freshness Classification System
+# 🥦 FreshVision  — Food Freshness Classification System
 
 > Full-Stack · AI/ML · Cloud-Deployed · GLA University ML Mini Project 2025-26
 
