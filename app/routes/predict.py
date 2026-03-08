@@ -1,68 +1,99 @@
 """
-app/routes/predict.py — Food freshness prediction endpoint
-POST /predict — accepts image upload, returns prediction page
+predict.py — Image upload and freshness classification route
+Author: Siddhi Singh (Full-Stack Lead)
 """
 import os
 import uuid
-from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
-from ..utils.preprocess import preprocess_image
-from ..utils.inference import run_inference
-from ..models.database import get_db
+import json
+from functools import wraps
+from flask import (Blueprint, render_template, request,
+                   redirect, url_for, session, flash, current_app)
+from werkzeug.utils import secure_filename
+from app.models.database import get_db
+from app.utils.preprocess import allowed_file, validate_image
+from app.utils.inference import run_inference
 
-predict_bp = Blueprint("predict", __name__)
+predict_bp = Blueprint('predict', __name__)
 
-ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "webp"}
-
-
-def allowed_file(filename):
-    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+UPLOAD_FOLDER  = os.path.join(os.path.dirname(__file__), '..', 'static', 'uploads')
+MAX_CONTENT_LENGTH = 10 * 1024 * 1024  # 10 MB
 
 
-@predict_bp.route("/predict", methods=["GET", "POST"])
-def predict():
-    if request.method == "GET":
-        return render_template("predict.html")
+def login_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if not session.get('user_id'):
+            flash('Please sign in to continue.', 'warning')
+            return redirect(url_for('auth.login'))
+        return f(*args, **kwargs)
+    return decorated
 
-    # --- Handle POST (image upload) ---
-    if "file" not in request.files:
-        flash("No file uploaded.", "danger")
-        return redirect(url_for("predict.predict"))
 
-    file = request.files["file"]
-    if file.filename == "" or not allowed_file(file.filename):
-        flash("Please upload a valid image (JPG, PNG, WEBP).", "danger")
-        return redirect(url_for("predict.predict"))
+@predict_bp.route('/predict', methods=['GET', 'POST'])
+@login_required
+def upload():
+    if request.method == 'GET':
+        return render_template('predict.html')
 
-    # Save uploaded file
-    ext = file.filename.rsplit(".", 1)[1].lower()
-    filename = f"{uuid.uuid4().hex}.{ext}"
-    save_path = os.path.join(current_app.config["UPLOAD_FOLDER"], filename)
+    # ── File validation ───────────────────────────────────────
+    if 'image' not in request.files:
+        flash('No file selected.', 'danger')
+        return render_template('predict.html')
+
+    file = request.files['image']
+
+    if file.filename == '':
+        flash('No file selected.', 'danger')
+        return render_template('predict.html')
+
+    if not allowed_file(file.filename):
+        flash('Invalid file type. Please upload JPG, PNG, or WEBP.', 'danger')
+        return render_template('predict.html')
+
+    # ── Save with UUID filename ───────────────────────────────
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+    original_name = secure_filename(file.filename)
+    ext           = original_name.rsplit('.', 1)[1].lower()
+    safe_filename = f"{uuid.uuid4().hex}.{ext}"
+    save_path     = os.path.join(UPLOAD_FOLDER, safe_filename)
     file.save(save_path)
 
-    # Preprocess + run model
-    image_array = preprocess_image(save_path)
-    result = run_inference(image_array)          # {"label": ..., "confidence": ..., "scores": {...}}
+    # ── Validate image content ────────────────────────────────
+    ok, err = validate_image(save_path)
+    if not ok:
+        os.remove(save_path)
+        flash(f'Invalid image: {err}', 'danger')
+        return render_template('predict.html')
 
-    # Persist to SQLite
+    # ── Run inference ─────────────────────────────────────────
+    result = run_inference(save_path)
+
+    # ── Persist to DB ─────────────────────────────────────────
     db = get_db()
-    db.execute(
-        "INSERT INTO predictions (filename, label, confidence) VALUES (?, ?, ?)",
-        (filename, result["label"], result["confidence"]),
+    cur = db.execute(
+        '''INSERT INTO predictions
+           (user_id, filename, original_name, label, display_label, confidence, probabilities)
+           VALUES (?, ?, ?, ?, ?, ?, ?)''',
+        (
+            session['user_id'],
+            safe_filename,
+            original_name,
+            result['label'],
+            result['display_label'],
+            result['confidence'],
+            json.dumps(result.get('probabilities', {})),
+        )
     )
     db.commit()
+    prediction_id = cur.lastrowid
 
-    return render_template("result.html", result=result, filename=filename)
-
-
-@predict_bp.route("/feedback", methods=["POST"])
-def feedback():
-    prediction_id = request.form.get("prediction_id")
-    correct_label = request.form.get("correct_label")
-    db = get_db()
-    db.execute(
-        "INSERT INTO feedback (prediction_id, correct_label) VALUES (?, ?)",
-        (prediction_id, correct_label),
+    return render_template(
+        'result.html',
+        filename      = safe_filename,
+        original_name = original_name,
+        label         = result['label'],
+        display_label = result['display_label'],
+        confidence    = result['confidence'],
+        probabilities = result.get('probabilities', {}),
+        prediction_id = prediction_id,
     )
-    db.commit()
-    flash("Thanks for your feedback!", "success")
-    return redirect(url_for("history.history"))
