@@ -1,87 +1,114 @@
 {% extends "base.html" %}
-{% block title %}History — FreshnessAI{% endblock %}
+{% block title %}History — FreshVision AI{% endblock %}
 
 {% block content %}
-<h2 class="fw-bold mb-4"><i class="bi bi-clock-history me-2 text-success"></i>Prediction History</h2>
-
-{% if predictions %}
-  <!-- Summary Stats -->
-  <div class="row g-3 mb-4">
-    {% set fresh_count = predictions | selectattr("label", "equalto", "Fresh") | list | length %}
-    {% set moderate_count = predictions | selectattr("label", "equalto", "Moderately Fresh") | list | length %}
-    {% set spoiled_count = predictions | selectattr("label", "equalto", "Spoiled") | list | length %}
-    <div class="col-md-3">
-      <div class="card text-center border-0 shadow-sm">
-        <div class="card-body">
-          <div class="fs-3 fw-bold">{{ predictions | length }}</div>
-          <div class="text-muted small">Total Predictions</div>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card text-center border-success border-0 shadow-sm">
-        <div class="card-body">
-          <div class="fs-3 fw-bold text-success">{{ fresh_count }}</div>
-          <div class="text-muted small">Fresh</div>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card text-center border-0 shadow-sm">
-        <div class="card-body">
-          <div class="fs-3 fw-bold text-warning">{{ moderate_count }}</div>
-          <div class="text-muted small">Moderately Fresh</div>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card text-center border-0 shadow-sm">
-        <div class="card-body">
-          <div class="fs-3 fw-bold text-danger">{{ spoiled_count }}</div>
-          <div class="text-muted small">Spoiled</div>
-        </div>
-      </div>
-    </div>
+<div class="mb-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
+  <div>
+    <h2 style="font-weight:800; letter-spacing:-0.02em;">Prediction History</h2>
+    <p style="color:var(--muted); margin:0;">{{ total }} total predictions</p>
   </div>
+  <a href="{{ url_for('predict.upload') }}" class="btn btn-primary btn-sm">
+    <i class="bi bi-plus me-1"></i>New Classification
+  </a>
+</div>
 
-  <!-- Predictions Table -->
-  <div class="card border-0 shadow-sm">
-    <div class="card-body p-0">
-      <table class="table table-hover mb-0">
-        <thead class="table-success">
-          <tr>
-            <th>#</th>
-            <th>Image</th>
-            <th>Label</th>
-            <th>Confidence</th>
-            <th>Date &amp; Time</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for p in predictions %}
-          <tr>
-            <td class="text-muted">{{ p["id"] }}</td>
-            <td>
-              <img src="{{ url_for('static', filename='uploads/' + p['filename']) }}"
-                   style="width:50px; height:50px; object-fit:cover;" class="rounded" alt="food" />
-            </td>
-            <td>
-              {% set badge = "success" if p["label"] == "Fresh" else ("warning" if p["label"] == "Moderately Fresh" else "danger") %}
-              <span class="badge bg-{{ badge }}">{{ p["label"] }}</span>
-            </td>
-            <td>{{ (p["confidence"] * 100) | round(1) }}%</td>
-            <td class="text-muted small">{{ p["created_at"] }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+<!-- Filter Bar -->
+<div class="card p-3 mb-4">
+  <form method="GET" class="d-flex gap-2 flex-wrap align-items-center">
+    <select name="label" class="form-select form-select-sm" style="max-width:160px;" onchange="this.form.submit()">
+      <option value="">All Labels</option>
+      <option value="fresh"  {% if label_filter == 'fresh'  %}selected{% endif %}>Fresh</option>
+      <option value="semi"   {% if label_filter == 'semi'   %}selected{% endif %}>Semi-Fresh</option>
+      <option value="stale"  {% if label_filter == 'stale'  %}selected{% endif %}>Rotten</option>
+    </select>
+    {% if label_filter %}
+      <a href="{{ url_for('history.view_history') }}" class="btn btn-outline-secondary btn-sm">Clear</a>
+    {% endif %}
+  </form>
+</div>
+
+{% if rows %}
+<div class="card">
+  <div class="table-responsive">
+    <table class="table mb-0">
+      <thead>
+        <tr>
+          <th>Image</th>
+          <th>File</th>
+          <th>Label</th>
+          <th>Confidence</th>
+          <th>Date</th>
+          <th>Feedback</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        <tr>
+          <td style="width:60px;">
+            <img src="{{ url_for('static', filename='uploads/' + row.filename) }}"
+                 style="width:48px; height:48px; object-fit:cover; border-radius:6px; border:1px solid var(--border);"
+                 alt="food" />
+          </td>
+          <td class="mono" style="font-size:0.8rem; max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+            {{ row.original_name or row.filename }}
+          </td>
+          <td>
+            <span class="label-pill
+              {% if row.label == 'fresh' %}pill-fresh
+              {% elif row.label == 'semi' %}pill-semi
+              {% else %}pill-stale{% endif %}">
+              {{ row.display_label or row.label }}
+            </span>
+          </td>
+          <td class="mono" style="font-size:0.85rem;">
+            {{ "%.1f"|format(row.confidence) }}%
+          </td>
+          <td class="mono" style="font-size:0.78rem; color:var(--muted);">
+            {{ row.created_at[:16] if row.created_at else '—' }}
+          </td>
+          <td>
+            <form method="POST" action="{{ url_for('history.submit_feedback') }}" class="d-flex gap-1">
+              <input type="hidden" name="prediction_id" value="{{ row.id }}" />
+              <select name="correct_label" class="form-select form-select-sm" style="max-width:130px; font-size:0.75rem;">
+                <option value="">Correct?</option>
+                <option value="Fresh">Fresh</option>
+                <option value="Semi-Fresh">Semi-Fresh</option>
+                <option value="Rotten">Rotten</option>
+              </select>
+              <button type="submit" class="btn btn-outline-secondary btn-sm" style="font-size:0.75rem;">✓</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
+</div>
+
+<!-- Pagination -->
+{% if total_pages > 1 %}
+<nav class="mt-4">
+  <ul class="pagination justify-content-center">
+    <li class="page-item {% if page == 1 %}disabled{% endif %}">
+      <a class="page-link" href="?page={{ page - 1 }}&label={{ label_filter or '' }}">‹</a>
+    </li>
+    {% for p in range(1, total_pages + 1) %}
+    <li class="page-item {% if p == page %}active{% endif %}">
+      <a class="page-link" href="?page={{ p }}&label={{ label_filter or '' }}">{{ p }}</a>
+    </li>
+    {% endfor %}
+    <li class="page-item {% if page == total_pages %}disabled{% endif %}">
+      <a class="page-link" href="?page={{ page + 1 }}&label={{ label_filter or '' }}">›</a>
+    </li>
+  </ul>
+</nav>
+{% endif %}
 
 {% else %}
-  <div class="text-center py-5 text-muted">
-    <i class="bi bi-inbox fs-1 mb-3 d-block"></i>
-    <p>No predictions yet. <a href="{{ url_for('predict.predict') }}">Classify your first image!</a></p>
-  </div>
+<div class="text-center py-5" style="color:var(--muted);">
+  <i class="bi bi-inbox" style="font-size:3rem; display:block; margin-bottom:1rem;"></i>
+  <p>No predictions yet.</p>
+  <a href="{{ url_for('predict.upload') }}" class="btn btn-primary mt-2">Make your first classification</a>
+</div>
 {% endif %}
 {% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Sign In — FreshVision AI{% endblock %}
+
+{% block content %}
+<div class="auth-card">
+  <div class="card p-4">
+    <div class="text-center mb-4">
+      <h3 style="font-weight:800; letter-spacing:-0.02em;">Welcome back</h3>
+      <p style="color:var(--muted); font-size:0.9rem;">Sign in to your FreshVision account</p>
+    </div>
+
+    <form method="POST">
+      <div class="mb-3">
+        <label class="form-label">Username</label>
+        <input type="text" name="username" class="form-control" placeholder="your username" required autofocus />
+      </div>
+      <div class="mb-4">
+        <label class="form-label">Password</label>
+        <input type="password" name="password" class="form-control" placeholder="••••••••" required />
+      </div>
+      <button type="submit" class="btn btn-primary w-100">Sign In</button>
+    </form>
+
+    <p class="text-center mt-3 mb-0" style="font-size:0.88rem; color:var(--muted);">
+      Don't have an account?
+      <a href="{{ url_for('auth.register') }}" style="color:var(--accent);">Register</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

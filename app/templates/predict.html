@@ -1,80 +1,54 @@
 {% extends "base.html" %}
-{% block title %}Classify — FreshnessAI{% endblock %}
+{% block title %}Classify — FreshVision AI{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
-  <div class="col-md-7">
-    <h2 class="fw-bold mb-4"><i class="bi bi-camera me-2 text-success"></i>Upload Food Image</h2>
+  <div class="col-lg-8">
 
-    <div class="card shadow-sm border-0">
-      <div class="card-body p-4">
-        <form method="POST" action="{{ url_for('predict.predict') }}" enctype="multipart/form-data">
-
-          <!-- Drag & Drop Zone -->
-          <div id="drop-zone"
-               class="border border-2 border-dashed border-success rounded p-5 text-center mb-4"
-               style="cursor:pointer; background:#f8fff8;">
-            <i class="bi bi-cloud-upload fs-1 text-success mb-2"></i>
-            <p class="mb-1 fw-semibold">Drag &amp; drop an image here</p>
-            <p class="text-muted small">or click to browse (JPG, PNG, WEBP)</p>
-            <input id="file-input" type="file" name="file" accept="image/*"
-                   class="d-none" required />
-          </div>
-
-          <!-- Preview -->
-          <div id="preview-wrapper" class="text-center mb-4 d-none">
-            <img id="preview-img" src="#" alt="Preview"
-                 class="img-fluid rounded shadow-sm" style="max-height:280px;" />
-            <p id="preview-name" class="text-muted small mt-2"></p>
-          </div>
-
-          <button type="submit" class="btn btn-success btn-lg w-100">
-            <i class="bi bi-search me-2"></i>Classify Freshness
-          </button>
-        </form>
-      </div>
+    <div class="mb-4">
+      <h2 style="font-weight:800; letter-spacing:-0.02em;">Classify Food</h2>
+      <p style="color:var(--muted);">Upload a clear photo of your food item to get an instant freshness prediction.</p>
     </div>
 
-    <p class="text-muted small mt-3 text-center">
-      Supported categories: Fruits &bull; Vegetables &bull; Meat &bull; Dairy
-    </p>
+    <div class="card p-4">
+      <form method="POST" enctype="multipart/form-data" id="upload-form">
+        <!-- Drop Zone -->
+        <div id="drop-zone" class="p-5 text-center mb-4" onclick="document.getElementById('file-input').click()">
+          <div id="drop-default">
+            <i class="bi bi-cloud-upload drop-icon"></i>
+            <p><strong>Drag & drop</strong> your image here</p>
+            <p class="mt-1">or click to browse</p>
+            <p class="mt-2 mono" style="font-size:0.75rem; color:var(--muted);">JPG · PNG · WEBP · max 10MB</p>
+          </div>
+          <div id="preview-box" class="mt-2">
+            <img id="preview-img" src="" alt="Preview" />
+            <p id="file-name" class="mono mt-2" style="font-size:0.8rem; color:var(--muted);"></p>
+          </div>
+        </div>
+
+        <input type="file" id="file-input" name="image" accept="image/*" style="display:none;" required />
+
+        <div class="d-flex gap-3">
+          <button type="submit" class="btn btn-primary px-4" id="submit-btn">
+            <i class="bi bi-lightning-charge me-2"></i>Classify
+          </button>
+          <button type="button" class="btn btn-outline-secondary" onclick="resetForm()">
+            <i class="bi bi-arrow-counterclockwise me-1"></i>Reset
+          </button>
+        </div>
+      </form>
+    </div>
+
   </div>
 </div>
 {% endblock %}
 
-{% block scripts %}
+{% block extra_scripts %}
 <script>
-  const dropZone   = document.getElementById("drop-zone");
-  const fileInput  = document.getElementById("file-input");
-  const previewWrap = document.getElementById("preview-wrapper");
-  const previewImg = document.getElementById("preview-img");
-  const previewName = document.getElementById("preview-name");
-
-  dropZone.addEventListener("click", () => fileInput.click());
-
-  dropZone.addEventListener("dragover", e => {
-    e.preventDefault();
-    dropZone.classList.add("bg-success", "bg-opacity-10");
-  });
-  dropZone.addEventListener("dragleave", () => dropZone.classList.remove("bg-success", "bg-opacity-10"));
-  dropZone.addEventListener("drop", e => {
-    e.preventDefault();
-    fileInput.files = e.dataTransfer.files;
-    showPreview(e.dataTransfer.files[0]);
-  });
-
-  fileInput.addEventListener("change", () => showPreview(fileInput.files[0]));
-
-  function showPreview(file) {
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = e => {
-      previewImg.src = e.target.result;
-      previewName.textContent = file.name;
-      previewWrap.classList.remove("d-none");
-      dropZone.classList.add("d-none");
-    };
-    reader.readAsDataURL(file);
-  }
+function resetForm() {
+  document.getElementById('file-input').value = '';
+  document.getElementById('preview-box').style.display = 'none';
+  document.getElementById('drop-default').style.display = 'block';
+}
 </script>
 {% endblock %}
