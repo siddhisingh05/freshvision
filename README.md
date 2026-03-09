@@ -10,7 +10,7 @@
 
 **Live Demo (Gradio):** [huggingface.co/spaces/Lazypanda0103/Unified-Comprehensive-Freshness-Classification](https://huggingface.co/spaces/Lazypanda0103/Unified-Comprehensive-Freshness-Classification)  
 **Flask App:** Deployed on Render.com (see deployment section)  
-**Course:** ML Mini Project · B.Tech CSE (AI/ML) Sem 4 · 3 Academic Credits
+**Course:** ML Mini Project · B.Tech CSE (AI/ML) Sem 4 ·
 
 ---
 
