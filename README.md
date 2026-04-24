@@ -198,7 +198,7 @@ Training notebook: `ml/notebooks/FreshnessAI_Training.ipynb`
 | Component | Service | Status |
 |-----------|---------|--------|
 | ML Model (Gradio) | HuggingFace Spaces | ✅ Live |
-| Flask App | Render.com | 🟡 Deploying |
+| Flask App | Render.com | ✅ Live |
 | CI/CD | GitHub Actions | ✅ Active |
 
 **HuggingFace Spaces (Gradio demo):**  
