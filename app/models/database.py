@@ -30,6 +30,8 @@ def init_db(app):
                 id         INTEGER PRIMARY KEY AUTOINCREMENT,
                 username   TEXT    NOT NULL UNIQUE,
                 password   TEXT    NOT NULL,
+                security_question TEXT,
+                security_answer   TEXT,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             );
 
@@ -53,4 +55,11 @@ def init_db(app):
                 created_at    DATETIME DEFAULT CURRENT_TIMESTAMP
             );
         ''')
+
+        existing_columns = {row['name'] for row in db.execute('PRAGMA table_info(users)').fetchall()}
+        if 'security_question' not in existing_columns:
+            db.execute('ALTER TABLE users ADD COLUMN security_question TEXT')
+        if 'security_answer' not in existing_columns:
+            db.execute('ALTER TABLE users ADD COLUMN security_answer TEXT')
+
         db.commit()

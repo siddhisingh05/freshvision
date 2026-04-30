@@ -3,42 +3,36 @@
 
 {% block content %}
 <div class="row justify-content-center">
-  <div class="col-lg-8">
+  <div class="col-lg-7 col-xl-6">
+    <div class="card p-4 p-md-5">
+      <div class="text-center mb-4">
+        <p class="mono mb-1" style="font-size:0.72rem; color:var(--text);">UPLOAD · ANALYZE · KNOW</p>
+        <h2 style="font-weight:300; letter-spacing:0.05em; margin-bottom:0.25rem;">Classify Your Produce</h2>
+        <p style="color:var(--muted); margin-bottom:0;">Drop a photo below and get a clean freshness result.</p>
+      </div>
 
-    <div class="mb-4">
-      <h2 style="font-weight:800; letter-spacing:-0.02em;">Classify Food</h2>
-      <p style="color:var(--muted);">Upload a clear photo of your food item to get an instant freshness prediction.</p>
-    </div>
-
-    <div class="card p-4">
       <form method="POST" enctype="multipart/form-data" id="upload-form">
-        <!-- Drop Zone -->
         <div id="drop-zone" class="p-5 text-center mb-4" onclick="document.getElementById('file-input').click()">
           <div id="drop-default">
-            <i class="bi bi-cloud-upload drop-icon"></i>
-            <p><strong>Drag & drop</strong> your image here</p>
+            <i class="bi bi-image drop-icon"></i>
+            <p><strong>Drop image here</strong></p>
             <p class="mt-1">or click to browse</p>
-            <p class="mt-2 mono" style="font-size:0.75rem; color:var(--muted);">JPG · PNG · WEBP · max 10MB</p>
+            <p class="mt-2 mono" style="font-size:0.72rem; color:var(--muted);">JPG · PNG · WEBP · max 10MB</p>
           </div>
           <div id="preview-box" class="mt-2">
             <img id="preview-img" src="" alt="Preview" />
-            <p id="file-name" class="mono mt-2" style="font-size:0.8rem; color:var(--muted);"></p>
+            <p id="file-name" class="mono mt-2" style="font-size:0.72rem; color:var(--muted);"></p>
           </div>
         </div>
 
-        <input type="file" id="file-input" name="image" accept="image/*" style="display:none;" required />
+        <input type="file" id="file-input" name="file" accept="image/*" style="display:none;" required />
 
-        <div class="d-flex gap-3">
-          <button type="submit" class="btn btn-primary px-4" id="submit-btn">
-            <i class="bi bi-lightning-charge me-2"></i>Classify
-          </button>
-          <button type="button" class="btn btn-outline-secondary" onclick="resetForm()">
-            <i class="bi bi-arrow-counterclockwise me-1"></i>Reset
-          </button>
+        <div class="d-flex gap-3 justify-content-center flex-wrap">
+          <button type="submit" class="btn btn-primary px-4" id="submit-btn">Classify Now</button>
+          <button type="button" class="btn btn-outline-secondary" onclick="resetForm()">Reset</button>
         </div>
       </form>
     </div>
-
   </div>
 </div>
 {% endblock %}

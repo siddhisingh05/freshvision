@@ -2,90 +2,65 @@
 {% block title %}FreshVision AI — Food Freshness Classifier{% endblock %}
 
 {% block content %}
-<!-- Hero -->
-<div class="row align-items-center py-5" style="min-height: 70vh;">
-  <div class="col-lg-6">
-    <p class="mono text-accent mb-2" style="font-size:0.85rem; letter-spacing:0.1em;">
-      AI-POWERED · DEEP LEARNING
-    </p>
-    <h1 style="font-size:3rem; font-weight:800; line-height:1.1; letter-spacing:-0.03em;">
-      Know if your<br/>food is <span class="text-fresh">fresh</span><br/>in seconds.
-    </h1>
-    <p class="mt-3" style="color:var(--muted); max-width:480px; font-size:1.05rem;">
-      Upload a photo of any fruit, vegetable, or produce.
-      Our YOLOv8 + EfficientNetB0 pipeline classifies it as
-      <span class="text-fresh">Fresh</span>,
-      <span style="color:var(--semi)">Semi-Fresh</span>, or
-      <span class="text-stale">Rotten</span> — instantly.
-    </p>
-    <div class="mt-4 d-flex gap-3 flex-wrap">
-      {% if session.get('user_id') %}
-        <a href="{{ url_for('predict.upload') }}" class="btn btn-primary px-4">
-          <i class="bi bi-upload me-2"></i>Classify Now
-        </a>
-        <a href="{{ url_for('history.view_history') }}" class="btn btn-outline-secondary px-4">
-          View History
-        </a>
-      {% else %}
-        <a href="{{ url_for('auth.register') }}" class="btn btn-primary px-4">
-          Get Started Free
-        </a>
-        <a href="{{ url_for('auth.login') }}" class="btn btn-outline-secondary px-4">
-          Sign In
-        </a>
-      {% endif %}
+<section class="hero-panel card p-0 overflow-hidden">
+  <div class="row g-0 align-items-stretch">
+    <div class="col-lg-6">
+      <div class="hero-visual">
+        <img src="{{ url_for('static', filename='images/WhatsApp Image 2026-04-30 at 11.52.13 PM.jpeg') }}"
+             alt="Fruit assortment illustration"
+             class="w-100 h-100"
+             style="object-fit: cover;" />
+      </div>
+    </div>
+    <div class="col-lg-6 d-flex align-items-center">
+      <div class="p-4 p-lg-5 text-center w-100">
+        <p class="mono mb-2" style="font-size:0.72rem; color:var(--text);">UPLOAD. ANALYZE. KNOW.</p>
+        <h1 style="font-size:clamp(2.2rem, 4vw, 3.5rem); font-weight:300; letter-spacing:0.02em; line-height:1.05; color:var(--text);">
+          IS YOUR PRODUCE<br/>FRESH?
+        </h1>
+        <p class="mx-auto mt-3" style="max-width: 420px; color:var(--muted); font-size:0.95rem;">
+          Drop a photo of any fruit or vegetable and the model will tell you whether it is fresh or spoiled in under a second.
+        </p>
+        <div class="mt-4">
+          {% if session.get('user_id') %}
+            <a href="{{ url_for('predict.upload') }}" class="btn btn-primary px-4">Classify Now</a>
+          {% else %}
+            <a href="{{ url_for('auth.login') }}" class="btn btn-primary px-4">Classify Now</a>
+          {% endif %}
+        </div>
+      </div>
     </div>
   </div>
+</section>
 
-  <div class="col-lg-6 mt-5 mt-lg-0">
-    <div class="row g-3">
-      <div class="col-6">
-        <div class="card p-3 text-center">
-          <div style="font-size:2rem; color:var(--fresh);">92%</div>
-          <div style="color:var(--muted); font-size:0.8rem; margin-top:4px;">Model Accuracy</div>
+<section class="py-5 text-center">
+  <p class="mono mb-1" style="font-size:0.72rem; color:var(--text);">TWO-CLASS DETECTION</p>
+  <h2 style="font-weight:300; letter-spacing:0.05em;">HOW IT WORKS</h2>
+  <div class="row justify-content-center g-4 mt-3">
+    <div class="col-md-4">
+      <div class="card p-0 h-100 overflow-hidden">
+        <img src="{{ url_for('static', filename='images/WhatsApp Image 2026-04-30 at 11.33.03 PM.jpeg') }}"
+             alt="Fresh apple illustration"
+             class="w-100"
+             style="height: 220px; object-fit: cover;" />
+        <div class="p-3">
+          <div style="font-size:0.95rem; color:var(--fresh); font-weight:600;">Fresh</div>
+          <p class="mb-0" style="font-size:0.82rem; color:var(--muted);">Produce is in optimal condition and safe to consume.</p>
         </div>
       </div>
-      <div class="col-6">
-        <div class="card p-3 text-center">
-          <div style="font-size:2rem; color:var(--accent);">&lt; 5s</div>
-          <div style="color:var(--muted); font-size:0.8rem; margin-top:4px;">Inference Time</div>
-        </div>
-      </div>
-      <div class="col-6">
-        <div class="card p-3 text-center">
-          <div style="font-size:2rem; color:var(--accent2);">3</div>
-          <div style="color:var(--muted); font-size:0.8rem; margin-top:4px;">Freshness Classes</div>
-        </div>
-      </div>
-      <div class="col-6">
-        <div class="card p-3 text-center">
-          <div style="font-size:2rem; color:var(--semi);">YOLOv8</div>
-          <div style="color:var(--muted); font-size:0.8rem; margin-top:4px;">+ EfficientNetB0</div>
+    </div>
+    <div class="col-md-4">
+      <div class="card p-0 h-100 overflow-hidden">
+        <img src="{{ url_for('static', filename='images/WhatsApp Image 2026-04-30 at 11.32.04 PM.jpeg') }}"
+             alt="Spoiled apple illustration"
+             class="w-100"
+             style="height: 220px; object-fit: cover;" />
+        <div class="p-3">
+          <div style="font-size:0.95rem; color:var(--stale); font-weight:600;">Spoiled</div>
+          <p class="mb-0" style="font-size:0.82rem; color:var(--muted);">Produce has deteriorated and should not be consumed.</p>
         </div>
       </div>
     </div>
   </div>
-</div>
-
-<!-- How it works -->
-<div class="py-5">
-  <h2 class="text-center mb-4" style="font-weight:700; letter-spacing:-0.02em;">How it works</h2>
-  <div class="row g-4">
-    {% for step in [
-      ("01", "bi-upload", "Upload", "Drag and drop or click to upload any food image."),
-      ("02", "bi-cpu", "Detect", "YOLOv8 locates the food item and crops the region of interest."),
-      ("03", "bi-lightning-charge", "Classify", "EfficientNetB0 predicts freshness with confidence scores."),
-      ("04", "bi-graph-up", "Track", "Every result saved to your history dashboard."),
-    ] %}
-    <div class="col-md-3">
-      <div class="card p-4 h-100">
-        <div class="mono text-accent mb-2" style="font-size:0.75rem; letter-spacing:0.1em;">STEP {{ step[0] }}</div>
-        <i class="bi {{ step[1] }} mb-2" style="font-size:1.5rem; color:var(--accent);"></i>
-        <h6 style="font-weight:700;">{{ step[2] }}</h6>
-        <p style="color:var(--muted); font-size:0.85rem; margin:0;">{{ step[3] }}</p>
-      </div>
-    </div>
-    {% endfor %}
-  </div>
-</div>
+</section>
 {% endblock %}

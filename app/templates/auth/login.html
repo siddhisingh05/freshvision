@@ -22,6 +22,10 @@
     </form>
 
     <p class="text-center mt-3 mb-0" style="font-size:0.88rem; color:var(--muted);">
+      <a href="{{ url_for('auth.forgot_password') }}" style="color:var(--accent);">Forgot password?</a>
+    </p>
+
+    <p class="text-center mt-3 mb-0" style="font-size:0.88rem; color:var(--muted);">
       Don't have an account?
       <a href="{{ url_for('auth.register') }}" style="color:var(--accent);">Register</a>
     </p>

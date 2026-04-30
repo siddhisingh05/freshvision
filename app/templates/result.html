@@ -3,125 +3,57 @@
 
 {% block content %}
 <div class="row justify-content-center">
-  <div class="col-lg-8">
-
-    <div class="mb-4 d-flex align-items-center gap-3">
-      <a href="{{ url_for('predict.upload') }}" class="btn btn-outline-secondary btn-sm">
-        <i class="bi bi-arrow-left me-1"></i>Classify Another
-      </a>
-      <h2 class="mb-0" style="font-weight:800; letter-spacing:-0.02em;">Result</h2>
+  <div class="col-lg-9">
+    <div class="mb-4 d-flex align-items-center gap-3 justify-content-between flex-wrap">
+      <a href="{{ url_for('predict.upload') }}" class="btn btn-outline-secondary btn-sm">Classify Another</a>
+      <h2 class="mb-0" style="font-weight:300; letter-spacing:0.04em;">Analysis Complete</h2>
     </div>
 
-    <div class="row g-4">
-      <!-- Image -->
+    <div class="row g-4 align-items-stretch">
       <div class="col-md-5">
-        <div class="card p-3 text-center h-100 d-flex flex-column justify-content-center">
+        <div class="card p-3 h-100 text-center">
           <img src="{{ url_for('static', filename='uploads/' + filename) }}"
                alt="Uploaded food image for freshness classification"
-               role="img"
-               style="width:100%; border-radius:8px; object-fit:cover; max-height:280px;" />
-          <p class="mono mt-2 mb-0" style="font-size:0.75rem; color:var(--muted);">
-            {{ original_name }}
-          </p>
+               class="w-100"
+               style="border-radius:8px; object-fit:cover; max-height:320px;" />
+          <p class="mono mt-2 mb-0" style="font-size:0.72rem; color:var(--muted);">{{ original_name }}</p>
         </div>
       </div>
 
-      <!-- Result Card -->
       <div class="col-md-7">
-        <div class="card p-4 h-100">
-          <p class="mono mb-2" style="font-size:0.72rem; color:var(--muted); letter-spacing:0.1em;">FRESHNESS PREDICTION</p>
+        <div class="card p-4 h-100 text-center d-flex flex-column justify-content-center">
+          <p class="mono mb-2" style="font-size:0.72rem; color:var(--text);">CLASSIFICATION RESULT</p>
+          <div class="mb-3">
+            <p class="mb-1" style="font-size:0.85rem; color:var(--muted);">Fruit</p>
+            <p style="font-size:1.5rem; font-weight:500;">{{ fruit }}</p>
+          </div>
 
-          <!-- Freshness Badge -->
           <div class="mb-3">
             {% if label == 'fresh' %}
-              <span class="freshness-badge badge-fresh" role="status" aria-label="Fresh food">
-                <i class="bi bi-check-circle me-2" aria-hidden="true"></i>{{ display_label }}
-              </span>
-            {% elif label == 'semi' %}
-              <span class="freshness-badge badge-semi" role="status" aria-label="Semi-fresh food">
-                <i class="bi bi-exclamation-circle me-2" aria-hidden="true"></i>{{ display_label }}
-              </span>
+              <span class="freshness-badge badge-fresh">{{ condition }}</span>
             {% else %}
-              <span class="freshness-badge badge-stale" role="status" aria-label="Rotten food">
-                <i class="bi bi-x-circle me-2" aria-hidden="true"></i>{{ display_label }}
-              </span>
+              <span class="freshness-badge badge-stale">{{ condition }}</span>
             {% endif %}
           </div>
 
-          <!-- Confidence -->
           <div class="confidence-score mb-1">{{ confidence }}%</div>
-          <p style="color:var(--muted); font-size:0.85rem;">confidence score</p>
+          <p style="color:var(--muted); font-size:0.85rem;">confidence</p>
 
-          <!-- Interpretation -->
-          <div class="mt-2 mb-3 p-3" style="background:var(--surface2); border-radius:8px;">
+          <div class="mt-3 p-3" style="background:rgba(255,255,255,0.28); border-radius:8px;">
             {% if label == 'fresh' %}
-              <p class="mb-0 text-fresh" style="font-size:0.85rem;">
-                <i class="bi bi-check2-circle me-2"></i>This food appears to be in good condition and safe to consume.
-              </p>
-            {% elif label == 'semi' %}
-              <p class="mb-0" style="font-size:0.85rem; color:var(--semi);">
-                <i class="bi bi-exclamation-triangle me-2"></i>This food shows early signs of degradation. Use soon or inspect carefully.
-              </p>
+              <p class="mb-0 text-fresh" style="font-size:0.85rem;">This {{ fruit }} appears to be in good condition.</p>
             {% else %}
-              <p class="mb-0 text-stale" style="font-size:0.85rem;">
-                <i class="bi bi-x-octagon me-2"></i>This food may have spoiled. Please inspect carefully before consuming.
-              </p>
+              <p class="mb-0 text-stale" style="font-size:0.85rem;">This {{ fruit }} may have spoiled. Please inspect carefully.</p>
             {% endif %}
-          </div>
-
-          <!-- Per-class probability bars -->
-          {% if probabilities %}
-          <div class="mt-2">
-            <p class="mono mb-2" style="font-size:0.72rem; color:var(--muted); letter-spacing:0.08em;">CLASS PROBABILITIES</p>
-            {% for cls, prob in probabilities.items() %}
-            <div class="mb-2">
-              <div class="d-flex justify-content-between mb-1">
-                <span style="font-size:0.8rem; color:var(--muted);">{{ cls }}</span>
-                <span class="mono" style="font-size:0.8rem;">{{ "%.1f"|format(prob * 100) }}%</span>
-              </div>
-              <div class="progress" role="progressbar" aria-valuenow="{{ (prob * 100)|int }}" aria-valuemin="0" aria-valuemax="100">
-                <div class="progress-bar
-                  {% if 'fresh' in cls.lower() and 'semi' not in cls.lower() %}progress-fresh
-                  {% elif 'semi' in cls.lower() %}progress-semi
-                  {% else %}progress-stale{% endif %}"
-                  style="width: {{ prob * 100 }}%">
-                </div>
-              </div>
-            </div>
-            {% endfor %}
-          </div>
-          {% endif %}
-
-          <!-- Feedback form -->
-          <div class="mt-4 pt-3" style="border-top:1px solid var(--border);">
-            <p class="mono mb-2" style="font-size:0.72rem; color:var(--muted); letter-spacing:0.08em;">WRONG PREDICTION? HELP US IMPROVE</p>
-            <form method="POST" action="{{ url_for('history.submit_feedback') }}" class="d-flex gap-2 flex-wrap align-items-center">
-              <input type="hidden" name="prediction_id" value="{{ prediction_id }}" />
-              <select name="correct_label" class="form-select form-select-sm" style="max-width:160px;" aria-label="Correct label">
-                <option value="">Select correct label</option>
-                <option value="Fresh">Fresh</option>
-                <option value="Semi-Fresh">Semi-Fresh</option>
-                <option value="Rotten">Rotten</option>
-              </select>
-              <button type="submit" class="btn btn-outline-secondary btn-sm">
-                <i class="bi bi-send me-1"></i>Submit
-              </button>
-            </form>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Bottom actions -->
     <div class="mt-4 d-flex justify-content-center gap-3 flex-wrap">
-      <a href="{{ url_for('history.view_history') }}" class="btn btn-outline-secondary">
-        <i class="bi bi-clock-history me-2"></i>View All Predictions
-      </a>
-      <a href="{{ url_for('predict.upload') }}" class="btn btn-primary">
-        <i class="bi bi-upload me-2"></i>Classify Another
-      </a>
+      <a href="{{ url_for('history.view_history') }}" class="btn btn-outline-secondary">View History</a>
+      <a href="{{ url_for('predict.upload') }}" class="btn btn-primary">Classify Another</a>
     </div>
-
   </div>
 </div>
 {% endblock %}
